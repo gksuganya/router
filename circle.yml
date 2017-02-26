@@ -7,3 +7,6 @@ dependencies:
 compile:
   override:
     - sbt compile
+test
+  override:
+    - sbt test
