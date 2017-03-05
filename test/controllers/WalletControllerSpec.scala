@@ -1,19 +1,36 @@
 package controllers
 
+import com.github.tomakehurst.wiremock.WireMockServer
+import com.github.tomakehurst.wiremock.client.WireMock._
+import org.scalatest.BeforeAndAfterAll
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.libs.json.{JsDefined, JsNumber}
 import play.api.libs.ws._
 import play.api.test.Helpers._
 
-class WalletControllerSpec extends PlaySpec with OneServerPerSuite {
+class WalletControllerSpec extends PlaySpec with OneServerPerSuite with BeforeAndAfterAll {
   private val ws = app.injector.instanceOf[WSClient]
   private val url = s"http://${s"localhost:$port"}"
+
+  private val wiremock = new WireMockServer(9090)
+
+  override def beforeAll(): Unit = wiremock.start()
+
+  override def afterAll(): Unit = wiremock.stop()
+
   "getting wallet" should {
     "have balance" in {
-      val response = await(ws.url(url +"/api/wallet").get())
+      configureFor(wiremock.port())
+      stubFor(get(urlMatching("/wallets/0"))
+        .willReturn(aResponse()
+          .withStatus(200)
+          .withBody("{\"balance\": 0}")))
+
+
+      val response = await(ws.url(url + "/api/wallet").get())
 
       response.status mustBe OK
-      response.json \ "balance" mustBe  JsDefined(JsNumber(0))
+      response.json \ "balance" mustBe JsDefined(JsNumber(0))
     }
   }
 }
