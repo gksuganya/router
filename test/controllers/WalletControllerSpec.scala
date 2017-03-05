@@ -4,15 +4,20 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock._
 import org.scalatest.BeforeAndAfterAll
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
+import play.api.Application
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsDefined, JsNumber}
 import play.api.libs.ws._
 import play.api.test.Helpers._
 
 class WalletControllerSpec extends PlaySpec with OneServerPerSuite with BeforeAndAfterAll {
-  private val ws = app.injector.instanceOf[WSClient]
-  private val url = s"http://${s"localhost:$port"}"
 
+  override lazy val app: Application = new GuiceApplicationBuilder()
+    .configure("wallet.url" -> "http://localhost:9090").build
+
+  private val ws = app.injector.instanceOf[WSClient]
   private val wiremock = new WireMockServer(9090)
+  private val url = s"http://${s"localhost:$port"}"
 
   override def beforeAll(): Unit = wiremock.start()
 
