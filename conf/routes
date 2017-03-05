@@ -1,2 +1,2 @@
-GET     /api/wallet                           controllers.WalletController.get
+GET        /wallet        controllers.WalletController.get
 

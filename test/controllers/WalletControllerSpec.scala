@@ -28,7 +28,7 @@ class WalletControllerSpec extends PlaySpec with OneServerPerSuite with WalletMo
           .withBody("{\"balance\": 0}")))
 
 
-      val response = await(ws.url(url + "/api/wallet").get())
+      val response = await(ws.url(url + "/wallet").get())
 
       response.status mustBe OK
       response.json \ "balance" mustBe JsDefined(JsNumber(0))
