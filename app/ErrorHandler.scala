@@ -23,13 +23,14 @@ class ErrorHandler @Inject()(
     Future.successful(InternalServerError(error(exception.getMessage)))
   }
 
-  override def onForbidden(request: RequestHeader, message: String): Future[Result] = {
+  override def onForbidden(request: RequestHeader, message: String): Future[Result] =
     Future.successful(Forbidden(error(message)))
-  }
 
-  override protected def onBadRequest(request: RequestHeader, message: String): Future[Result] = Future.successful(BadRequest(error(message)))
+  override protected def onBadRequest(request: RequestHeader, message: String): Future[Result] =
+    Future.successful(BadRequest(error(message)))
 
   private def error(message: String) = JsObject(Seq("message" -> JsString(message)))
 
-  override protected def onNotFound(request: RequestHeader, message: String): Future[Result] = Future.successful(NotFound(error(message)))
+  override protected def onNotFound(request: RequestHeader, message: String): Future[Result] =
+    Future.successful(NotFound(error(message)))
 }

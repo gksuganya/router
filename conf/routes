@@ -1,2 +1,3 @@
-GET        /wallet        controllers.WalletController.get
+GET        /wallet             controllers.WalletController.get
+GET        /games/*path        controllers.GamesController.get(path:String)
 

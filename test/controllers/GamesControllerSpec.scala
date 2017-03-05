@@ -1,37 +1,35 @@
 package controllers
 
-import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock._
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.{JsDefined, JsNumber}
+import play.api.libs.json.{JsDefined, JsString}
 import play.api.libs.ws._
 import play.api.test.Helpers._
 
-class WalletControllerSpec extends PlaySpec with OneServerPerSuite with WalletMock {
+class GamesControllerSpec extends PlaySpec with OneServerPerSuite with GameMock {
 
   override lazy val app: Application = new GuiceApplicationBuilder()
-    .configure("wallet.url" -> s"http://localhost:$walletPort").build
+    .configure("games.url" -> s"http://localhost:$gamePort").build
 
   private val ws = app.injector.instanceOf[WSClient]
-  private val wiremock = new WireMockServer(9090)
   private val url = s"http://${s"localhost:$port"}"
 
-  "getting wallet" should {
-    "have balance" in {
-      configureFor(walletPort)
-      stubFor(get(urlMatching("/wallets/0"))
-        .withHeader("Authorization", equalTo("Basic cm91dGVyOnJvdXRlcg=="))
+  "game" should {
+    "get game" in {
+      configureFor(gamePort)
+      stubFor(get(urlMatching("/games/mock"))
+        .withHeader("PlayerId", equalTo("0"))
+        .withHeader("Wallet", equalTo("http://wallet:8080/wallets/0"))
         .willReturn(aResponse()
           .withStatus(200)
-          .withBody("{\"balance\": 0}")))
+          .withBody("{\"foo\": \"bar\"}")))
 
-
-      val response = await(ws.url(url + "/api/wallet").get())
+      val response = await(ws.url(url + "/games/mock").get())
 
       response.status mustBe OK
-      response.json \ "balance" mustBe JsDefined(JsNumber(0))
+      response.json \ "foo" mustBe JsDefined(JsString("bar"))
     }
   }
 }
