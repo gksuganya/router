@@ -16,9 +16,10 @@ class GamesControllerSpec extends PlaySpec with OneServerPerSuite with GameMock 
   private val ws = app.injector.instanceOf[WSClient]
   private val url = s"http://${s"localhost:$port"}"
 
+  private val cookie = "PLAY_SESSION=3b07e0d19797703cea79aaacc07db66a8cf715c0-WalletId=0; Path=/; HTTPOnly"
   "game" should {
     "handle internal error" in {
-      val response = await(ws.url(url + "/games/mock").get())
+      val response = await(ws.url(url + "/games/mock").withHeaders("Cookie" -> cookie).get())
 
       response.status mustBe INTERNAL_SERVER_ERROR
       response.json \ "message" mustBe JsDefined(JsString("internal server error"))
@@ -27,7 +28,7 @@ class GamesControllerSpec extends PlaySpec with OneServerPerSuite with GameMock 
       stubFor(get(urlMatching("/wallets/0"))
         .willReturn(aResponse()
           .withStatus(500)))
-      val response = await(ws.url(url + "/wallet").get())
+      val response = await(ws.url(url + "/wallet").withHeaders("Cookie" -> cookie).get())
 
       response.status mustBe INTERNAL_SERVER_ERROR
       response.json \ "message" mustBe JsDefined(JsString("internal server error"))
@@ -40,7 +41,7 @@ class GamesControllerSpec extends PlaySpec with OneServerPerSuite with GameMock 
           .withStatus(200)
           .withBody("{\"foo\": \"bar\"}")))
 
-      val response = await(ws.url(url + "/games/mock").get())
+      val response = await(ws.url(url + "/games/mock").withHeaders("Cookie" -> cookie).get())
 
       response.status mustBe OK
       response.json \ "foo" mustBe JsDefined(JsString("bar"))
@@ -59,10 +60,12 @@ class GamesControllerSpec extends PlaySpec with OneServerPerSuite with GameMock 
 
       val response = await(ws.url(url + "/games/mock")
         .withHeaders("Content-Type" -> "application/json")
+        .withHeaders("Cookie" -> cookie)
         .post("{\"foo\":\"bar\"}"))
 
       response.status mustBe CREATED
       response.json \ "baz" mustBe JsDefined(JsString("qux"))
     }
   }
+
 }

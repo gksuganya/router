@@ -29,8 +29,7 @@ class WalletController @Inject()(ws: WSClient, walletConfig: WalletConfig, authC
   }
 
   private def walletId(request: Request[_]): Future[String] = {
-    request.session
-      .get("WalletId")
+    controllers.walletId(request)
       .map {
         Future.successful
       }
