@@ -27,6 +27,7 @@ class WalletControllerSpec extends PlaySpec with OneServerPerSuite with BeforeAn
     "have balance" in {
       configureFor(wiremock.port())
       stubFor(get(urlMatching("/wallets/0"))
+        .withHeader("Authorization", equalTo("Basic cm91dGVyOnJvdXRlcg=="))
         .willReturn(aResponse()
           .withStatus(200)
           .withBody("{\"balance\": 0}")))
