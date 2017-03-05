@@ -24,6 +24,7 @@ class GamesControllerSpec extends PlaySpec with OneServerPerSuite with GameMock 
       response.json \ "message" mustBe JsDefined(JsString("internal server error"))
     }
     "handle proxy error" in {
+      configureFor(gamePort)
       stubFor(get(urlMatching("/wallets/0"))
         .willReturn(aResponse()
           .withStatus(500)))
