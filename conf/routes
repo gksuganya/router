@@ -1,5 +1,2 @@
-# Routes
-# This file defines all application routes (Higher priority routes first)
-# ~~~~
+GET     /api/wallet                           controllers.WalletController.get
 
-GET     /                           controllers.HomeController.index
