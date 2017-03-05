@@ -18,7 +18,7 @@ class GamesController @Inject()(ws: WSClient, walletConfig: WalletConfig, gamesC
         "Wallet" -> s"${walletConfig.url}/wallets/$id"
       )
       .get()
-      .map { resp => Ok(resp.json) }
+      .map { resp => if (resp.status == 200) Ok(resp.json) else BadGateway(ErrorFormatter.error("bad gateway")) }
   }
 
   def post(path: String): Action[AnyContent] = Action.async { request =>
@@ -30,6 +30,6 @@ class GamesController @Inject()(ws: WSClient, walletConfig: WalletConfig, gamesC
         "Wallet" -> s"${walletConfig.url}/wallets/$id"
       )
       .post(request.body.asJson.get)
-      .map { resp => Created(resp.json) }
+      .map { resp => if (resp.status == 201) Created(resp.json) else BadGateway(ErrorFormatter.error("bad gateway")) }
   }
 }

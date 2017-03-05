@@ -5,34 +5,39 @@ import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsDefined, JsString}
-import play.api.libs.ws._
-import play.api.test.Helpers._
+import play.api.test.FakeRequest
+import play.api.test.Helpers.{route, _}
 
 class GamesControllerSpec extends PlaySpec with OneServerPerSuite with GameMock {
 
   override lazy val app: Application = new GuiceApplicationBuilder()
     .configure("games.url" -> s"http://localhost:$gamePort").build
 
-  private val ws = app.injector.instanceOf[WSClient]
   private val url = s"http://${s"localhost:$port"}"
 
-  private val cookie = "PLAY_SESSION=3b07e0d19797703cea79aaacc07db66a8cf715c0-WalletId=0; Path=/; HTTPOnly"
   "game" should {
     "handle internal error" in {
-      val response = await(ws.url(url + "/games/mock").withHeaders("Cookie" -> cookie).get())
+      val request = FakeRequest(GET, "/games/mock").withSession("WalletId" -> "0")
 
-      response.status mustBe INTERNAL_SERVER_ERROR
-      response.json \ "message" mustBe JsDefined(JsString("internal server error"))
+      val response = route(app, request).get
+
+      status(response) mustBe BAD_GATEWAY
+      contentAsJson(response) \ "message" mustBe JsDefined(JsString("bad gateway"))
     }
+
     "handle proxy error" in {
-      stubFor(get(urlMatching("/wallets/0"))
+      stubFor(get(urlMatching("/games/mock"))
         .willReturn(aResponse()
           .withStatus(500)))
-      val response = await(ws.url(url + "/wallet").withHeaders("Cookie" -> cookie).get())
 
-      response.status mustBe INTERNAL_SERVER_ERROR
-      response.json \ "message" mustBe JsDefined(JsString("internal server error"))
+      val request = FakeRequest(GET, "/games/mock").withSession("WalletId" -> "0")
+
+      val response = route(app, request).get
+
+      status(response) mustBe BAD_GATEWAY
+      contentAsJson(response) \ "message" mustBe JsDefined(JsString("bad gateway"))
     }
+
     "get game" in {
       stubFor(get(urlMatching("/games/mock"))
         .withHeader("PlayerId", equalTo("0"))
@@ -41,10 +46,12 @@ class GamesControllerSpec extends PlaySpec with OneServerPerSuite with GameMock 
           .withStatus(200)
           .withBody("{\"foo\": \"bar\"}")))
 
-      val response = await(ws.url(url + "/games/mock").withHeaders("Cookie" -> cookie).get())
+      val request = FakeRequest(GET, "/games/mock").withSession("WalletId" -> "0")
 
-      response.status mustBe OK
-      response.json \ "foo" mustBe JsDefined(JsString("bar"))
+      val response = route(app, request).get
+
+      status(response) mustBe OK
+      contentAsJson(response) \ "foo" mustBe JsDefined(JsString("bar"))
     }
 
     "create game event" in {
@@ -57,14 +64,14 @@ class GamesControllerSpec extends PlaySpec with OneServerPerSuite with GameMock 
           .withStatus(201)
           .withBody("{\"baz\":\"qux\"}"))
       )
-
-      val response = await(ws.url(url + "/games/mock")
+      val request = FakeRequest(POST, "/games/mock").withSession("WalletId" -> "0")
         .withHeaders("Content-Type" -> "application/json")
-        .withHeaders("Cookie" -> cookie)
-        .post("{\"foo\":\"bar\"}"))
+        .withBody("{\"foo\":\"bar\"}")
 
-      response.status mustBe CREATED
-      response.json \ "baz" mustBe JsDefined(JsString("qux"))
+      val response = route(app, request).get
+
+      status(response) mustBe CREATED
+      contentAsJson(response) \ "baz" mustBe JsDefined(JsString("qux"))
     }
   }
 
