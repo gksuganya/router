@@ -1,6 +1,7 @@
 package controllers
 
 import com.github.tomakehurst.wiremock.WireMockServer
+import com.github.tomakehurst.wiremock.client.WireMock
 import org.scalatest.{BeforeAndAfterAll, Suite}
 
 trait WalletMock extends BeforeAndAfterAll {
@@ -11,6 +12,9 @@ trait WalletMock extends BeforeAndAfterAll {
 
   override def beforeAll(): Unit = walletMock.start()
 
-  override def afterAll(): Unit = walletMock.stop()
+  override def afterAll(): Unit = {
+    WireMock.reset()
+    walletMock.stop()
+  }
 
 }

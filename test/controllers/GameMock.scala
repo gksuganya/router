@@ -1,6 +1,7 @@
 package controllers
 
 import com.github.tomakehurst.wiremock.WireMockServer
+import com.github.tomakehurst.wiremock.client.WireMock
 import org.scalatest.{BeforeAndAfterAll, Suite}
 
 trait GameMock extends BeforeAndAfterAll {
@@ -11,6 +12,9 @@ trait GameMock extends BeforeAndAfterAll {
 
   override def beforeAll(): Unit = gameMock.start()
 
-  override def afterAll(): Unit = gameMock.stop()
+  override def afterAll(): Unit = {
+    WireMock.reset()
+    gameMock.stop()
+  }
 
 }
