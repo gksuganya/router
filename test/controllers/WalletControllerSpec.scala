@@ -35,17 +35,23 @@ class WalletControllerSpec extends PlaySpec with OneServerPerSuite with WalletMo
       response.json \ "message" mustBe JsDefined(JsString("bad gateway"))
     }
     "have balance" in {
-      configureFor(walletPort)
+      stubFor(post(urlMatching("/wallets"))
+        .withHeader("Authorization", equalTo("Basic cm91dGVyOnJvdXRlcg=="))
+        .willReturn(aResponse()
+          .withStatus(201)
+          .withHeader("Location", ",'.p.,/0")))
+
       stubFor(get(urlMatching("/wallets/0"))
         .withHeader("Authorization", equalTo("Basic cm91dGVyOnJvdXRlcg=="))
         .willReturn(aResponse()
           .withStatus(200)
           .withBody("{\"balance\": 0}")))
 
-
       val response = await(ws.url(url + "/wallet").get())
 
       response.status mustBe OK
+      // TODO we should probably encrypt this
+      response.header("Set-Cookie").get must include("WalletId")
       response.json \ "balance" mustBe JsDefined(JsNumber(0))
     }
   }

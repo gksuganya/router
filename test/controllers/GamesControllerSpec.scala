@@ -24,7 +24,6 @@ class GamesControllerSpec extends PlaySpec with OneServerPerSuite with GameMock 
       response.json \ "message" mustBe JsDefined(JsString("internal server error"))
     }
     "handle proxy error" in {
-      configureFor(gamePort)
       stubFor(get(urlMatching("/wallets/0"))
         .willReturn(aResponse()
           .withStatus(500)))
@@ -34,7 +33,6 @@ class GamesControllerSpec extends PlaySpec with OneServerPerSuite with GameMock 
       response.json \ "message" mustBe JsDefined(JsString("internal server error"))
     }
     "get game" in {
-      configureFor(gamePort)
       stubFor(get(urlMatching("/games/mock"))
         .withHeader("PlayerId", equalTo("0"))
         .withHeader("Wallet", equalTo("http://wallet:8080/wallets/0"))
@@ -49,7 +47,6 @@ class GamesControllerSpec extends PlaySpec with OneServerPerSuite with GameMock 
     }
 
     "create game event" in {
-      configureFor(gamePort)
       stubFor(post(urlMatching("/games/mock"))
         .withHeader("PlayerId", equalTo("0"))
         .withHeader("Wallet", equalTo("http://wallet:8080/wallets/0"))

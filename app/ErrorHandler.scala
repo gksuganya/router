@@ -1,6 +1,7 @@
 import javax.inject._
 
 import controllers.ErrorFormatter
+import infra.BadGatewayException
 import play.api._
 import play.api.http.DefaultHttpErrorHandler
 import play.api.mvc.Results._
@@ -20,7 +21,12 @@ class ErrorHandler @Inject()(
 
   override def onServerError(request: RequestHeader, exception: Throwable): Future[Result] = {
     exception.printStackTrace()
-    Future.successful(InternalServerError(ErrorFormatter.error("internal server error")))
+    Future.successful(
+      if (exception.isInstanceOf[BadGatewayException])
+        BadGateway(ErrorFormatter.error("bad gateway"))
+      else
+        InternalServerError(ErrorFormatter.error("internal server error"))
+    )
   }
 
   override def onForbidden(request: RequestHeader, message: String): Future[Result] =
