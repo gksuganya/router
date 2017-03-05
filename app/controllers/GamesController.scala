@@ -19,4 +19,14 @@ class GamesController @Inject()(ws: WSClient, walletConfig: WalletConfig, gamesC
       .get()
       .map { resp => Ok(resp.json) }
   }
+
+  def post(path: String): Action[AnyContent] = Action.async { request =>
+    ws.url(s"${gamesConfig.url}/games/$path")
+      .withHeaders(
+        "PlayerId" -> "0",
+        "Wallet" -> s"${walletConfig.url}/wallets/0"
+      )
+      .post(request.body.asJson.get)
+      .map { resp => Created(resp.json) }
+  }
 }

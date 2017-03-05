@@ -5,7 +5,7 @@ import com.github.tomakehurst.wiremock.client.WireMock._
 import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.{JsDefined, JsNumber}
+import play.api.libs.json.{JsDefined, JsNumber, JsString}
 import play.api.libs.ws._
 import play.api.test.Helpers._
 
@@ -19,6 +19,21 @@ class WalletControllerSpec extends PlaySpec with OneServerPerSuite with WalletMo
   private val url = s"http://${s"localhost:$port"}"
 
   "getting wallet" should {
+    "handle internal error" in {
+      val response = await(ws.url(url + "/wallet").get())
+
+      response.status mustBe INTERNAL_SERVER_ERROR
+      response.json \ "message" mustBe JsDefined(JsString("internal server error"))
+    }
+    "handle proxy error" in {
+      stubFor(get(urlMatching("/wallets/0"))
+        .willReturn(aResponse()
+          .withStatus(500)))
+      val response = await(ws.url(url + "/wallet").get())
+
+      response.status mustBe INTERNAL_SERVER_ERROR
+      response.json \ "message" mustBe JsDefined(JsString("internal server error"))
+    }
     "have balance" in {
       configureFor(walletPort)
       stubFor(get(urlMatching("/wallets/0"))

@@ -1,3 +1,4 @@
-GET        /wallet             controllers.WalletController.get
-GET        /games/*path        controllers.GamesController.get(path:String)
+GET         /wallet             controllers.WalletController.get
+GET         /games/*path        controllers.GamesController.get(path:String)
+POST        /games/*path        controllers.GamesController.post(path:String)
 

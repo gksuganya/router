@@ -20,7 +20,7 @@ class ErrorHandler @Inject()(
 
   override def onServerError(request: RequestHeader, exception: Throwable): Future[Result] = {
     exception.printStackTrace()
-    Future.successful(InternalServerError(error(exception.getMessage)))
+    Future.successful(InternalServerError(error("internal server error")))
   }
 
   override def onForbidden(request: RequestHeader, message: String): Future[Result] =
