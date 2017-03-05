@@ -14,6 +14,8 @@ class WalletController @Inject()(ws: WSClient, walletConfig: WalletConfig, authC
     ws.url(s"${walletConfig.url}/wallets/0")
       .withAuth(authConfig.username, authConfig.password, WSAuthScheme.BASIC)
       .get()
-      .map { resp => Ok(resp.json) }
+      .map { resp =>
+        if (resp.status == 200) Ok(resp.json) else BadGateway(ErrorFormatter.error("bad gateway"))
+      }
   }
 }

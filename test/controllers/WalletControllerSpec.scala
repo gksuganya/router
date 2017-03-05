@@ -22,17 +22,17 @@ class WalletControllerSpec extends PlaySpec with OneServerPerSuite with WalletMo
     "handle internal error" in {
       val response = await(ws.url(url + "/wallet").get())
 
-      response.status mustBe INTERNAL_SERVER_ERROR
-      response.json \ "message" mustBe JsDefined(JsString("internal server error"))
+      response.status mustBe BAD_GATEWAY
+      response.json \ "message" mustBe JsDefined(JsString("bad gateway"))
     }
     "handle proxy error" in {
       stubFor(get(urlMatching("/wallets/0"))
         .willReturn(aResponse()
-          .withStatus(500)))
+          .withStatus(502)))
       val response = await(ws.url(url + "/wallet").get())
 
-      response.status mustBe INTERNAL_SERVER_ERROR
-      response.json \ "message" mustBe JsDefined(JsString("internal server error"))
+      response.status mustBe BAD_GATEWAY
+      response.json \ "message" mustBe JsDefined(JsString("bad gateway"))
     }
     "have balance" in {
       configureFor(walletPort)
