@@ -8,10 +8,10 @@ dependencies:
     - sbt initialize
 compile:
   override:
-    - sbt compile
+    - sbt "set offline := true" compile
 test:
   override:
-    - sbt test
+    - sbt "set offline := true" test
   post:
     - mkdir -p $CIRCLE_TEST_REPORTS/junit/
     - find . -type f -regex ".*/target/test-reports/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
