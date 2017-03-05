@@ -2,9 +2,9 @@ package controllers
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
-import org.scalatest.{BeforeAndAfterAll, Suite}
+import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, Suite}
 
-trait WalletMock extends BeforeAndAfterAll {
+trait WalletMock extends BeforeAndAfterAll with BeforeAndAfter {
   this: Suite =>
   val walletPort = 8080
 
@@ -12,9 +12,10 @@ trait WalletMock extends BeforeAndAfterAll {
 
   override def beforeAll(): Unit = walletMock.start()
 
-  override def afterAll(): Unit = {
+  before {
     WireMock.reset()
-    walletMock.stop()
   }
+
+  override def afterAll(): Unit = walletMock.stop()
 
 }
