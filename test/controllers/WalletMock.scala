@@ -13,6 +13,7 @@ trait WalletMock extends BeforeAndAfterAll with BeforeAndAfter {
   override def beforeAll(): Unit = walletMock.start()
 
   before {
+    WireMock.configureFor(walletPort)
     WireMock.reset()
   }
 
