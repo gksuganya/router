@@ -41,6 +41,13 @@ class WalletControllerSpec extends PlaySpec with OneServerPerSuite with WalletMo
           .withStatus(201)
           .withHeader("Location", ",'.p.,/0")))
 
+      stubFor(post(urlMatching("/wallets/0/transactions"))
+        .withHeader("Authorization", equalTo("Basic cm91dGVyOnJvdXRlcg=="))
+        .withHeader("Content-Type", equalTo("application/json"))
+        .withRequestBody(equalTo("{\"amount\": 1000, \"category\": \"CREDIT\"}"))
+        .willReturn(aResponse()
+          .withStatus(201)))
+
       stubFor(get(urlMatching("/wallets/0"))
         .withHeader("Authorization", equalTo("Basic cm91dGVyOnJvdXRlcg=="))
         .willReturn(aResponse()

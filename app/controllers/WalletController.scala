@@ -41,15 +41,28 @@ class WalletController @Inject()(ws: WSClient, walletConfig: WalletConfig, authC
             if (resp.status == 201) {
               resp.header("Location").get.replaceFirst(".*/", "")
             } else {
-              println(resp.statusText)
-              println(resp.body)
               throw new FailedToCreateWalletException
             }
+          }
+          .flatMap { walletId =>
+            ws.url(s"${walletConfig.url}/wallets/$walletId/transactions")
+              .withAuth(authConfig.username, authConfig.password, WSAuthScheme.BASIC)
+              .withHeaders("Content-Type" -> "application/json")
+              .post("{\"amount\": 1000, \"category\": \"CREDIT\"}")
+              .map { resp =>
+                if (resp.status == 201) {
+                  walletId
+                } else {
+                  throw new FailedToCreditWalletException
+                }
+              }
           }
       }
   }
 }
 
 class FailedToCreateWalletException extends BadGatewayException("failed to create wallet")
+
+class FailedToCreditWalletException extends BadGatewayException("failed to credit wallet")
 
 class CouldNotGetWalletException extends BadGatewayException("could not get wallet")
