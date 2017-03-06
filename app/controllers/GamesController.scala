@@ -11,7 +11,7 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class GamesController @Inject()(ws: WSClient, walletConfig: WalletConfig, gamesConfig: GamesConfig, implicit val context: ExecutionContext) extends Controller {
   def get(path: String): Action[AnyContent] = Action.async { request =>
-    val id = walletId(request).getOrElse(throw new BadRequestException)
+    val id = walletId(request).getOrElse(throw new BadRequestException("no wallet id"))
     ws.url(s"${gamesConfig.url}/games/$path")
       .withHeaders(
         "PlayerId" -> id,
@@ -22,7 +22,7 @@ class GamesController @Inject()(ws: WSClient, walletConfig: WalletConfig, gamesC
   }
 
   def post(path: String): Action[AnyContent] = Action.async { request =>
-    val id = walletId(request).getOrElse(throw new BadRequestException)
+    val id = walletId(request).getOrElse(throw new BadRequestException("no wallet id"))
 
     ws.url(s"${gamesConfig.url}/games/$path")
       .withHeaders(

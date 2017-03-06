@@ -1,3 +1,3 @@
 package controllers
 
-class BadRequestException extends RuntimeException
+class BadRequestException(message: String) extends RuntimeException(message: String)

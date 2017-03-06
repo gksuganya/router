@@ -48,6 +48,6 @@ class WalletController @Inject()(ws: WSClient, walletConfig: WalletConfig, authC
   }
 }
 
-class FailedToCreateWalletException extends BadGatewayException
+class FailedToCreateWalletException extends BadGatewayException("failed to create wallet")
 
-class CouldNotGetWalletException extends BadGatewayException
+class CouldNotGetWalletException extends BadGatewayException("could not get wallet")

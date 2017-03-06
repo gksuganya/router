@@ -1,3 +1,3 @@
 package infra
 
-class BadGatewayException extends RuntimeException
+class BadGatewayException(message: String) extends RuntimeException(message: String)
