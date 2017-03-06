@@ -23,7 +23,7 @@ class WalletControllerSpec extends PlaySpec with OneServerPerSuite with WalletMo
       val response = await(ws.url(url + "/wallet").get())
 
       response.status mustBe BAD_GATEWAY
-      response.json \ "message" mustBe JsDefined(JsString("bad gateway"))
+      response.json \ "message" mustBe JsDefined(JsString("failed to create wallet"))
     }
     "handle proxy error" in {
       stubFor(get(urlMatching("/wallets/0"))
@@ -32,7 +32,7 @@ class WalletControllerSpec extends PlaySpec with OneServerPerSuite with WalletMo
       val response = await(ws.url(url + "/wallet").get())
 
       response.status mustBe BAD_GATEWAY
-      response.json \ "message" mustBe JsDefined(JsString("bad gateway"))
+      response.json \ "message" mustBe JsDefined(JsString("failed to create wallet"))
     }
     "have balance" in {
       stubFor(post(urlMatching("/wallets"))
