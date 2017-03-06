@@ -24,10 +24,10 @@ class ErrorHandler @Inject()(
 
     Future.successful(
       exception match {
-        case _: BadGatewayException => BadGateway(ErrorFormatter.error("bad gateway"))
-        case _: BadRequestException => {
+        case _: BadRequestException => BadRequest(ErrorFormatter.error("bad request"))
+        case _: BadGatewayException => {
           exception.printStackTrace()
-          BadRequest(ErrorFormatter.error("bad request"))
+          BadGateway(ErrorFormatter.error("bad gateway"))
         }
         case _ =>
           exception.printStackTrace()
