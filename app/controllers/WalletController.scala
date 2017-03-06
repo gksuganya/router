@@ -41,6 +41,8 @@ class WalletController @Inject()(ws: WSClient, walletConfig: WalletConfig, authC
             if (resp.status == 201) {
               resp.header("Location").get.replaceFirst(".*/", "")
             } else {
+              println(resp.statusText)
+              println(resp.body)
               throw new FailedToCreateWalletException
             }
           }
