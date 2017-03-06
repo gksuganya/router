@@ -27,7 +27,7 @@ class ErrorHandler @Inject()(
           BadRequest(ErrorFormatter.error(exception.getMessage))
         case _: BadGatewayException =>
           exception.printStackTrace()
-          BadGateway(ErrorFormatter.error("bad gateway"))
+          BadGateway(ErrorFormatter.error(exception.getMessage))
         case _ =>
           exception.printStackTrace()
           InternalServerError(ErrorFormatter.error("internal server error"))
