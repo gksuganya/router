@@ -1,7 +1,6 @@
 import javax.inject._
 
-import controllers.BadRequestException
-import controllers.ErrorFormatter
+import controllers.{BadRequestException, ErrorFormatter}
 import infra.BadGatewayException
 import play.api._
 import play.api.http.DefaultHttpErrorHandler
@@ -24,11 +23,11 @@ class ErrorHandler @Inject()(
 
     Future.successful(
       exception match {
-        case _: BadRequestException => BadRequest(ErrorFormatter.error("bad request"))
-        case _: BadGatewayException => {
+        case _: BadRequestException =>
+          BadRequest(ErrorFormatter.error(exception.getMessage))
+        case _: BadGatewayException =>
           exception.printStackTrace()
           BadGateway(ErrorFormatter.error("bad gateway"))
-        }
         case _ =>
           exception.printStackTrace()
           InternalServerError(ErrorFormatter.error("internal server error"))
