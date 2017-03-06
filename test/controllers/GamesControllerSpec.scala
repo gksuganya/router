@@ -16,14 +16,6 @@ class GamesControllerSpec extends PlaySpec with OneServerPerSuite with GameMock 
   private val url = s"http://${s"localhost:$port"}"
 
   "game" should {
-    "handle internal error" in {
-      val request = FakeRequest(GET, "/games/mock").withSession("WalletId" -> "0")
-
-      val response = route(app, request).get
-
-      status(response) mustBe BAD_GATEWAY
-      contentAsJson(response) \ "message" mustBe JsDefined(JsString("bad gateway"))
-    }
 
     "handle proxy error" in {
       stubFor(get(urlMatching("/games/mock"))
