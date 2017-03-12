@@ -12,7 +12,11 @@ import scala.concurrent.ExecutionContext
 class GamesController @Inject()(ws: WSClient, walletConfig: WalletConfig, gamesConfig: GamesConfig, implicit val context: ExecutionContext) extends Controller {
   def get(path: String): Action[AnyContent] = Action.async { request =>
     val id = walletId(request).getOrElse(throw new BadRequestException("no wallet id"))
-    ws.url(s"${gamesConfig.url}/games/$path")
+    val gameName = game(path)
+    if (!gamesConfig.isValidGame(gameName)) {
+      BadRequest(ErrorFormatter.error("bad game"))
+    }
+    ws.url(s"http://$gameName:8080/games/$path")
       .withHeaders(
         "PlayerId" -> id,
         "Wallet" -> s"${walletConfig.url}/wallets/$id"
@@ -23,13 +27,21 @@ class GamesController @Inject()(ws: WSClient, walletConfig: WalletConfig, gamesC
 
   def post(path: String): Action[AnyContent] = Action.async { request =>
     val id = walletId(request).getOrElse(throw new BadRequestException("no wallet id"))
+    val gameName = game(path)
+    if (!gamesConfig.isValidGame(gameName)) {
+      BadRequest(ErrorFormatter.error("bad game"))
+    }
 
-    ws.url(s"${gamesConfig.url}/games/$path")
+    ws.url(s"http://$gameName:8080/games/$path")
       .withHeaders(
         "PlayerId" -> id,
         "Wallet" -> s"${walletConfig.url}/wallets/$id"
       )
       .post(request.body.asJson.get)
       .map { resp => if (resp.status < 500) Status(resp.status)(resp.json) else BadGateway(ErrorFormatter.error("bad gateway")) }
+  }
+
+  private def game(path: String) = {
+    path.replaceFirst("/.*", "")
   }
 }
