@@ -18,11 +18,11 @@ class GamesControllerSpec extends PlaySpec with OneServerPerSuite with GameMock 
   "game" should {
 
     "handle proxy error" in {
-      stubFor(get(urlMatching("/games/localhost"))
+      stubFor(get(urlMatching("/api/games/localhost"))
         .willReturn(aResponse()
           .withStatus(500)))
 
-      val request = FakeRequest(GET, "/games/localhost").withSession("WalletId" -> "0")
+      val request = FakeRequest(GET, "/api/games/localhost").withSession("WalletId" -> "0")
 
       val response = route(app, request).get
 
@@ -31,14 +31,14 @@ class GamesControllerSpec extends PlaySpec with OneServerPerSuite with GameMock 
     }
 
     "get game" in {
-      stubFor(get(urlMatching("/games/localhost"))
+      stubFor(get(urlMatching("/api/games/localhost"))
         .withHeader("PlayerId", equalTo("0"))
         .withHeader("Wallet", equalTo("http://wallet:8080/wallets/0"))
         .willReturn(aResponse()
           .withStatus(200)
           .withBody("{\"foo\": \"bar\"}")))
 
-      val request = FakeRequest(GET, "/games/localhost").withSession("WalletId" -> "0")
+      val request = FakeRequest(GET, "/api/games/localhost").withSession("WalletId" -> "0")
 
       val response = route(app, request).get
 
@@ -47,7 +47,7 @@ class GamesControllerSpec extends PlaySpec with OneServerPerSuite with GameMock 
     }
 
     "create game event" in {
-      stubFor(post(urlMatching("/games/localhost"))
+      stubFor(post(urlMatching("/api/games/localhost"))
         .withHeader("PlayerId", equalTo("0"))
         .withHeader("Wallet", equalTo("http://wallet:8080/wallets/0"))
         .withHeader("Content-Type", equalTo("application/json"))
@@ -56,7 +56,7 @@ class GamesControllerSpec extends PlaySpec with OneServerPerSuite with GameMock 
           .withStatus(201)
           .withBody("{\"baz\":\"qux\"}"))
       )
-      val request = FakeRequest(POST, "/games/localhost").withSession("WalletId" -> "0")
+      val request = FakeRequest(POST, "/api/games/localhost").withSession("WalletId" -> "0")
         .withHeaders("Content-Type" -> "application/json")
         .withBody("{\"foo\":\"bar\"}")
 

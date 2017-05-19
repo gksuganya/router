@@ -11,8 +11,9 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class GamesController @Inject()(ws: WSClient, walletConfig: WalletConfig, gamesConfig: GamesConfig, implicit val context: ExecutionContext) extends Controller {
   def getAsset(path: String): Action[AnyContent] = get("assets", path)
+  def get(path: String): Action[AnyContent] = get("api", path)
 
-  def get(base: String = "api", path: String): Action[AnyContent] = Action.async { request =>
+  private def get(base: String, path: String): Action[AnyContent] = Action.async { request =>
     val id = walletId(request).getOrElse(throw new BadRequestException("no wallet id"))
     val gameName = game(path)
     if (!gamesConfig.isValidGame(gameName)) {
