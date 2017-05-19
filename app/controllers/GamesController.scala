@@ -10,13 +10,15 @@ import scala.concurrent.ExecutionContext
 
 @Singleton
 class GamesController @Inject()(ws: WSClient, walletConfig: WalletConfig, gamesConfig: GamesConfig, implicit val context: ExecutionContext) extends Controller {
-  def get(path: String): Action[AnyContent] = Action.async { request =>
+  def getAsset(path: String): Action[AnyContent] = get("assets", path)
+
+  def get(base: String = "api", path: String): Action[AnyContent] = Action.async { request =>
     val id = walletId(request).getOrElse(throw new BadRequestException("no wallet id"))
     val gameName = game(path)
     if (!gamesConfig.isValidGame(gameName)) {
       BadRequest(ErrorFormatter.error("bad game"))
     }
-    ws.url(s"http://$gameName:8080/games/$path")
+    ws.url(s"http://$gameName:8080/$base/games/$path")
       .withHeaders(
         "PlayerId" -> id,
         "Wallet" -> s"${walletConfig.url}/wallets/$id"
@@ -32,7 +34,7 @@ class GamesController @Inject()(ws: WSClient, walletConfig: WalletConfig, gamesC
       BadRequest(ErrorFormatter.error("bad game"))
     }
 
-    ws.url(s"http://$gameName:8080/games/$path")
+    ws.url(s"http://$gameName:8080/api/games/$path")
       .withHeaders(
         "PlayerId" -> id,
         "Wallet" -> s"${walletConfig.url}/wallets/$id"
