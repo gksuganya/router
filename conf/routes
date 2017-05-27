@@ -1,5 +1,4 @@
-GET         /api/wallet                controllers.WalletController.get
-GET         /assets/games/*path        controllers.GamesController.getAsset(path:        String)
-GET         /api/games/*path           controllers.GamesController.get(path:        String)
-POST        /api/games/*path           controllers.GamesController.post(path:String)
+GET         /api/wallet             controllers.WalletController.get
+GET         /api/games/*path        controllers.GamesController.get(path: String)
+POST        /api/games/*path        controllers.GamesController.post(path:String)
 
