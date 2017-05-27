@@ -1,0 +1,27 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/work
+    docker:
+      - image: "circleci/openjdk:8"
+    steps:
+      - checkout
+      - restore_cache:
+          key: maven-{{ checksum "build.sbt" }}
+      - run: sbt initialize
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: maven-{{ checksum "build.sbt" }}
+      - run: sbt test
+      - store_test_results:
+          path: target/surefire-reports
+      - store_test_results:
+          path: target/failsafe-reports
+      - run: sbt dist
+      - run: unzip -d target/universal target/universal/router-1.0.0-SNAPSHOT.zip
+      - setup_remote_docker
+      - run: docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+      - run: docker build --rm=false -t alexec/router:latest .
+      - run: docker push alexec/router
+      - run: "curl -fv -u $CIRCLE_TOKEN: -X POST -d '{\"build_parameters\": {\"COMPONENT\": \"router\"}}' -H 'Content-Type: application/json' https://circleci.com/api/v1.1/project/github/phoebus-games/deploy/tree/master"
