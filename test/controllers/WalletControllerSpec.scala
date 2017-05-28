@@ -29,7 +29,7 @@ class WalletControllerSpec extends PlaySpec with OneServerPerSuite with WalletMo
       stubFor(get(urlMatching("/wallets/0"))
         .willReturn(aResponse()
           .withStatus(502)))
-      val response = await(ws.url(url + "/api/wallet").get())
+      val response = await(ws.url(url + "/wallet").get())
 
       response.status mustBe BAD_GATEWAY
       response.json \ "message" mustBe JsDefined(JsString("failed to create wallet"))
