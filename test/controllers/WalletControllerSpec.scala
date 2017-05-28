@@ -20,7 +20,7 @@ class WalletControllerSpec extends PlaySpec with OneServerPerSuite with WalletMo
 
   "getting wallet" should {
     "handle internal error" in {
-      val response = await(ws.url(url + "/api/wallet").get())
+      val response = await(ws.url(url + "/wallet").get())
 
       response.status mustBe BAD_GATEWAY
       response.json \ "message" mustBe JsDefined(JsString("failed to create wallet"))
@@ -54,7 +54,7 @@ class WalletControllerSpec extends PlaySpec with OneServerPerSuite with WalletMo
           .withStatus(200)
           .withBody("{\"balance\": 0}")))
 
-      val response = await(ws.url(url + "/api/wallet").get())
+      val response = await(ws.url(url + "/wallet").get())
 
       response.status mustBe OK
       // TODO we should probably encrypt this
