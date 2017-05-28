@@ -30,6 +30,24 @@ class GamesControllerSpec extends PlaySpec with OneServerPerSuite with GameMock 
       contentAsJson(response) \ "message" mustBe JsDefined(JsString("bad gateway"))
     }
 
+    "get without wallet ID" in {
+      val request = FakeRequest(GET, "/api/games/localhost")
+
+      val response = route(app, request).get
+
+      status(response) mustBe BAD_REQUEST
+      contentAsJson(response) \ "message" mustBe JsDefined(JsString("no wallet ID"))
+    }
+
+    "get blacklisted game" in {
+      val request = FakeRequest(GET, "/api/games/blacklisted").withSession("WalletId" -> "0")
+
+      val response = route(app, request).get
+
+      status(response) mustBe BAD_REQUEST
+      contentAsJson(response) \ "message" mustBe JsDefined(JsString("bad game"))
+    }
+
     "get game" in {
       stubFor(get(urlMatching("/api/games/localhost"))
         .withHeader("PlayerId", equalTo("0"))
@@ -64,6 +82,24 @@ class GamesControllerSpec extends PlaySpec with OneServerPerSuite with GameMock 
 
       status(response) mustBe CREATED
       contentAsJson(response) \ "baz" mustBe JsDefined(JsString("qux"))
+    }
+
+    "post without wallet ID" in {
+      val request = FakeRequest(POST, "/api/games/localhost")
+
+      val response = route(app, request).get
+
+      status(response) mustBe BAD_REQUEST
+      contentAsJson(response) \ "message" mustBe JsDefined(JsString("no wallet ID"))
+    }
+
+    "post blacklisted game" in {
+      val request = FakeRequest(POST, "/api/games/blacklisted").withSession("WalletId" -> "0")
+
+      val response = route(app, request).get
+
+      status(response) mustBe BAD_REQUEST
+      contentAsJson(response) \ "message" mustBe JsDefined(JsString("bad game"))
     }
   }
 
