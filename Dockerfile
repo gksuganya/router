@@ -1,4 +1,8 @@
 FROM openjdk:8-jre-alpine
+WORKDIR /usr/src/app
+COPY package.json /usr/src/app/
+COPY . /usr/src/app/
+
 RUN ls
 RUN pwd
 ADD /home/circleci/work/target/universal/router-1.0.0-SNAPSHOT/ /
