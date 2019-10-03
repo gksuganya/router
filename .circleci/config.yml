@@ -37,3 +37,27 @@ jobs:
       - gcr/push-image:
           image: circle-gke
           tag: "v5"
+  deploy:
+    description: Deploy application to Google Kubernetes Engine
+    machine: true
+    steps:
+      # Install `gcloud` and `kubectl` if not already installed.
+      - gcp-gke/install
+      # Initialize the `gcloud` CLI.
+      - gcp-gke/init
+      # Update a deployment's Docker image.
+      - gcp-gke/rollout-image:
+          deployment: circle-ci-cluster
+          container: dominic-backend
+          image: gcr.io/zt-datalake-poc/circle-gke:v5
+workflows:
+  build_update_deploy:
+    jobs:
+      - build
+      - Build-Push-Image-Docker:
+          requires:
+            - build
+      - deploy:
+          requires:
+            - Build-Push-Image-Docker          
+ 
