@@ -25,3 +25,15 @@ jobs:
       #- run: docker build --rm=false -t alexec/router:$CIRCLE_SHA1 .
       #- run: docker push alexec/router
       #- run: ./deploy.sh
+  Build-Push-Image-Docker:
+    description: Build and push image to Google Container Registry
+    machine: true
+    steps:
+      - checkout
+      - gcr/gcr-auth
+      - gcr/build-image:
+          image: circle-gke
+          tag: "v5"
+      - gcr/push-image:
+          image: circle-gke
+          tag: "v5"
