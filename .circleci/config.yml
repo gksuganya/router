@@ -26,6 +26,8 @@ jobs:
           path: target/failsafe-reports
       - run: sbt dist
       - run: unzip -d target/universal target/universal/router-1.0.0-SNAPSHOT.zip
+      - run: pwd 
+      - run: ls
       #- setup_remote_docker
       #- run: docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
       #- run: docker build --rm=false -t alexec/router:$CIRCLE_SHA1 .
